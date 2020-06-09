@@ -8,21 +8,170 @@
 
 
 #define SIZE 1024
+#define INPUT_BUFFER_SIZE (64)
+#define QUIT_STRING "q"
 
 int main(int argc, char * argv[]){
 
-
+int fd;
+char *buf=NULL;
+char b;
+char input[100];
 	
 	if(argc == 1){
 		printf("Bem vindo\n");
 		printf("Ira introduzir os pedidos por aqui\n");
 
-		//do{
-		//	switch()
-		//}
-	}
+		
+    		char *command;
+    		int i;
 
-	int fd;
+			do{
+
+			while(read(0,&b,1)!=0 && b!='\n'){
+				input[i]=b;
+				i++;
+			}
+			input[i]='\0';
+				
+				command = strtok(input, " ");
+							
+
+			/*	if(strcmp(command,"tempo-inactividade")==0){ 
+
+					buf= malloc(1+strlen(input));
+
+					if((fd=open("FIFO",O_WRONLY))<0){
+					perror("open");
+					}
+
+					strcpy(buf,"i");
+					command=strtok(NULL,"\n");
+					strcpy(buf+1, command);
+					
+					write(fd,buf,strlen(buf)+1);
+
+					}
+			
+
+				
+				else if(strcmp(command,"tempo-execucao")==0){
+
+					buf= malloc(1+strlen(input));
+
+					if((fd=open("FIFO",O_WRONLY))<0){
+					perror("open");
+					}
+
+					strcpy(buf,"m");
+					command=strtok(NULL,"\n");
+					strcpy(buf+1, command);
+
+					write(fd,buf,strlen(buf)+1);
+
+					
+					}
+					*/
+				
+				 if(strcmp(command,"executar")==0){
+
+					buf= malloc(1+strlen(input));
+
+
+
+					if((fd=open("FIFO",O_WRONLY))<0){
+					perror("open");
+					} 
+
+					strcpy(buf,"e");
+
+					
+					command=strtok(NULL,"\n");
+					
+					printf("222=%s\n", command );
+					strcpy(buf+1, command);
+
+
+					write(fd,buf,strlen(buf)+1);
+
+					}
+
+/*
+				else if(strcmp(command,"listar\n")==0){
+
+					buf= malloc(1+strlen(input));
+
+					if((fd=open("FIFO",O_WRONLY))<0){
+					perror("open");
+					} 
+
+					strcpy(buf,"l");
+					
+
+					write(fd,buf,strlen(buf)+1);
+
+				}
+
+
+				else if(strcmp(command,"terminar")==0){
+
+					buf= malloc(1+strlen(input));
+
+					if((fd=open("FIFO",O_WRONLY))<0){
+					perror("open");
+					} 
+
+					strcpy(buf,"t");
+					command=strtok(NULL,"\n");
+					strcpy(buf+1, command);
+
+					write(fd,buf,strlen(buf)+1);
+
+				}
+*/
+
+				else if(strcmp(command,"historico")==0){
+
+					buf= malloc(1+strlen(input));
+
+					if((fd=open("FIFO",O_WRONLY))<0){
+					perror("open");
+					} 
+
+					strcpy(buf,"r");
+					
+
+					write(fd,buf,strlen(buf)+1);
+
+					}				
+
+				else if(strcmp(command,"ajuda")==0){
+
+
+					printf("AJUDAS\n");
+					printf("Comandos:\n");
+					printf("tempo-inactividade n (n=tempo maximo de inatividade num pipe anonimo)\n");
+					printf("tempo-execucao n (n=tempo maximo de execucao de uma tarefa)\n");	
+					printf("executar ´´p1 | p2 .. | pn´´ (executar tarefa)\n");
+					printf("listar (listar tarefas em execução)\n");
+					printf("terminar n (terminar tarefa n)\n");
+					printf("historico (registo historico de tarefas terminadas\n");
+					
+				}
+
+				
+
+		}while ((command == NULL) || strcmp(command, QUIT_STRING) != 0);
+
+		if (NULL != command)
+    {
+      printf("User quit.\n");
+    }
+
+  
+	} else{
+
+	
 
 	int r=0;
 
@@ -30,7 +179,7 @@ int main(int argc, char * argv[]){
 	
 	char c = comando[1];
 
-	char *buf=NULL;	
+		
 	
 	int fifo;
 
@@ -163,7 +312,7 @@ int main(int argc, char * argv[]){
 		break;
 
 	
-	
+	}
 	
 	}
 	return 0;

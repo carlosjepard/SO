@@ -6,11 +6,24 @@
 #include "header.h"
 
 
+int * pids;
+int pids_count;
+int timeout=0;
+int segundos=0;
+int completa = 0;
+
+void sigalarm_handler(int signum){
+
+
+	timeout=1;  
+
+		
+}
 
 int parsecomand(char * comando, char * resultado[]){
 
 
-	//char parvalheira[] = "parvalheira pessoal caralho";
+	
 
 
 	char * ptr = strtok(comando, " ");
@@ -20,16 +33,12 @@ int parsecomand(char * comando, char * resultado[]){
 	int i = 0;
 	while(ptr != NULL)
 	{	
-		//printf("%s\n", ptr );	
+		
 		resultado[i++] = strdup(ptr);
 		ptr = strtok(NULL, " ");
 	}
 
-	/*
-	for(int j=0; j<i; j++){
-		printf("resposta: %s\n", resultado[j] );
-	}
-*/
+	
 	resultado[i]=NULL;
 
 
@@ -37,10 +46,17 @@ int parsecomand(char * comando, char * resultado[]){
 
 
 
-int executa (char args[]){
+int executa (char args[], int tempoInat, int tempoExec){
+
+	if(signal(SIGALRM, sigalarm_handler)==SIG_ERR){
+
+		perror("signal sigalarm");
+
+		exit(3);
+	}
 
 	
-	
+	//printf("tempoExec= %d\n", tempoExec );
 
 	char * comando = args; 
 
@@ -61,26 +77,36 @@ int executa (char args[]){
 		quantos++;
 	}
 	
-	//printf("pedidos = %s\n", pedidos[0] );
 	
-	pid_t pid;
 
+	pids_count=quantos;
+
+	int * pids = (int*) malloc(sizeof(int)*quantos);
 	
-	
+	int pid;
+
+	//alarm(tempoExec);
+	//int i;
+	//while((segundos<tempoExec) && (completa == 0)){
+
+
 	if(quantos==1){
 
+
+		
+
 			
-			if(fork()==0){
+			if((pid=fork())==0){
 
 				
 			
 			char * respostas[10];
 
-			
+
 			parsecomand(pedidos[0], respostas);
 
+			sleep(10);
 			
-
 			execvp(respostas[0], respostas);
 
 
@@ -91,10 +117,14 @@ int executa (char args[]){
 
 		}
 
-		wait(NULL);
-		return 0;
+		pids[0]=pid;
+
+		
 
 		}
+
+
+	else{
 
 
 	
@@ -109,8 +139,9 @@ int executa (char args[]){
 				exit(1);
 			}
 
+			
 
-			if(fork()==0){
+			if((pid=fork())==0){
 
 				
 			close(pipe_fdd[i][0]);
@@ -119,8 +150,8 @@ int executa (char args[]){
 			
 			close(pipe_fdd[i][1]);
 			
-			
 
+		
 
 			char * respostas[10];
 
@@ -137,6 +168,7 @@ int executa (char args[]){
 
 		}
 		close(pipe_fdd[i][1]);
+	
 
 		}
 
@@ -148,7 +180,7 @@ int executa (char args[]){
 			}
 
 			close(pipe_fdd[i][1]);
-			if(fork()==0){
+			if((pid=fork())==0){
 
 				
 			//close(pipe_fdd[i][1]);
@@ -176,7 +208,7 @@ int executa (char args[]){
 
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][0]);
-
+		
 
 		}
 		else{
@@ -186,7 +218,7 @@ int executa (char args[]){
 				exit(1);
 			}
 
-			if(fork()==0){
+			if((pid=fork())==0){
 
 				
 			
@@ -218,24 +250,45 @@ int executa (char args[]){
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][1]);
 
+		
+
 		}
 
+		pids[i]=pid;
+
 		}
+	}
 
-		
-		
- 
-		for(int i=1; i<quantos;i++){
-
-			wait(NULL);
-
+	/*if(timeout){
 
 			
-		}
-
+		//while(segundos<tempoExec){
+ 
 		
+		//}
+	
+		for(int i=0; i<pids_count; i++){
+		printf("killing grep %d\n", pids[i]);
+
+
+		if(pids[i]>0){
+			kill(pids[i],SIGKILL);
+		}
+	}
+
+	printf("acabou o tempo de execucao\n");
+		free(pids);
+		return -1;	
+}
+*/
+
+	for(int i=0;i<quantos;i++){
+		wait(NULL);
+	}
 
 	return 0;
+
 }
+
 
 

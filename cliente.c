@@ -13,7 +13,7 @@ int main(int argc, char * argv[]){
 
 
 	
-	if(argc = 0){
+	if(argc == 1){
 		printf("Bem vindo\n");
 		printf("Ira introduzir os pedidos por aqui\n");
 
@@ -98,6 +98,60 @@ int main(int argc, char * argv[]){
 
 			
 
+
+
+			//while((r = read(0,buf,SIZE)) > 0) {
+     	 		
+     	 		write(fd,buf,strlen(buf)+1);
+            
+   			 //}
+
+		break;
+
+
+		case('m'):
+			
+
+			if((fd=open("FIFO",O_WRONLY))<0){
+				perror("open");
+			}
+
+			printf("tempo maximo definido = %s \n", argv[2]);
+			
+
+			buf = malloc(1+strlen(argv[2]));
+
+			strcpy(buf,"m");
+			strcpy(buf+1,argv[2]);
+
+			
+
+
+			//while((r = read(0,buf,SIZE)) > 0) {
+     	 		
+     	 		write(fd,buf,strlen(buf)+1);
+            
+   			 //}
+
+		break;
+
+
+		case('i'):
+			
+
+			if((fd=open("FIFO",O_WRONLY))<0){
+				perror("open");
+			}
+
+			printf("tempo de inatividade entre pipes anonimos = %s \n", argv[2]);
+			
+
+			buf = malloc(1+strlen(argv[2]));
+
+			strcpy(buf,"i");
+			strcpy(buf+1,argv[2]);
+
+			
 
 
 			//while((r = read(0,buf,SIZE)) > 0) {

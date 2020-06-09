@@ -5,4 +5,4 @@ typedef struct memoria{
 	char ** execucao;
 } memoria;
 
-int executa (char args[]);
+int executa (char args[], int tempoInatividade, int tempoExecucao);

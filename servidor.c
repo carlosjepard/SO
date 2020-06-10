@@ -16,9 +16,14 @@ int ter=0;
 int exe=0;
 int tempoExec=DEFAULT;
 int tempoInat=DEFAULT;
+int minhaVez=0;
+int bytesEscritos=0;
+
 
 //registo.terminadas= malloc(20*sizeof(char*));
 //registo.execucao=malloc(20*sizeof(char*));
+
+
 
 
 
@@ -48,6 +53,8 @@ int main(int argc, char * argv[]){
 
 	printf("palhacada\n");
 
+	int fw=open("logs.txt",O_WRONLY|O_CREAT|O_TRUNC,0600);
+	int fr=open("logs.txt",O_RDONLY,0600);
 
 	while(1) {
 
@@ -57,9 +64,28 @@ int main(int argc, char * argv[]){
     printf("merdas\n");
     while((r = read(fd,&buffer,SIZE)) > 0) {
 
+    			char * guarda = malloc(sizeof(strlen(buffer))-1);
+    			int bytesaff = strlen(buffer);
+
+    			if(buffer[0]=='m'){
+    				strcpy(guarda,buffer+1);
+
+    				tempoExec=atoi(guarda);
+
+    				printf("tempo de exec= %d\n", tempoExec);
+
+    			}
+    			else if(buffer[0]=='i'){
+    				strcpy(guarda,buffer+1);
+
+    				tempoInat=atoi(guarda);
+
+    				printf("tempo de Inatividade entre pipes anonimos= %d\n", tempoInat);
+    			}
+
 		    	if(fork()==0){
 
-    			char * guarda = malloc(sizeof(strlen(buffer))-1);
+    			
 
     			int pid;
 
@@ -77,6 +103,7 @@ int main(int argc, char * argv[]){
     			
 
     			strcpy(guarda,buffer+1);
+    			strcat(guarda, "\n");
 
     			if((pid=fork())==0){
       	
@@ -85,10 +112,13 @@ int main(int argc, char * argv[]){
       			//printf("pid filho= %d\n", pid );
 
       			printf("\n");
+		
+					
 
-      		
-
-      			int z=  executa(buffer+1, tempoInat, tempoExec);
+      			printf("tempoExec novo =%d\n", tempoExec );
+      			
+      			
+      			int z=  executa(buffer+1, tempoExec, tempoInat);
       			//sleep(10);
 
       			_exit(0);
@@ -105,8 +135,15 @@ int main(int argc, char * argv[]){
 
       			
 				printf("pidzao = %d\n", pid );
-				registo.terminadas[ter++]=guarda;
-      			
+
+				while(minhaVez==1){
+					sleep(1);
+				}
+
+				minhaVez=1;
+				bytesEscritos=write(fw,guarda,strlen(guarda));
+				printf("bytesEscritos filho = %d\n", bytesEscritos);
+				minhaVez=0;
 
 		}
 
@@ -119,13 +156,23 @@ int main(int argc, char * argv[]){
 
     			if(ter==0){
     				printf("Nao existem registos de tarefas concluidas\n");
+    				
     			}
 
     			else{
 
-    			for(int i=0;i<ter;i++){
-    				printf("%d: %s\n", i+1,registo.terminadas[i]);
+    			while(minhaVez==1){
+    				sleep(1);
+    			}
+    				minhaVez=1;
+    				char * res = (char*) malloc(sizeof(100));
+
+    				while(read(fr,res,100)>0){
+    					write(1,res,strlen(res));
     				}
+
+    				lseek(fr,0,SEEK_SET);
+
 
     			}	
 
@@ -136,11 +183,9 @@ int main(int argc, char * argv[]){
 
 
 
-    			strcpy(guarda,buffer+1);
+    			
 
-    			tempoExec=atoi(guarda);
-
-    			printf("tempo de exec= %d\n", tempoExec);
+    			
       	
       			
 
@@ -152,11 +197,9 @@ int main(int argc, char * argv[]){
 
 
 
-    			strcpy(guarda,buffer+1);
+    			
 
-    			tempoInat=atoi(guarda);
-
-    			printf("tempo de Inatividade entre pipes anonimos= %d\n", tempoInat);
+    			
       	
 
     			break;
@@ -173,19 +216,13 @@ int main(int argc, char * argv[]){
    		
    			}
 
-   				//_exit(0);
-   			//}
-
-   			//else{
-   				//wait(NULL);
-   				//printf("pedido efetuado\n");
-   			//}
+   		
    				_exit(0);
    		}
-   			else{
-			printf("pisa\n");
 
-		}
+
+   			ter++;
+   			
    			
 		}
 		

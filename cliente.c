@@ -171,7 +171,7 @@ char input[100];
   
 	} else{
 
-	
+	int fd;
 
 	int r=0;
 
@@ -179,7 +179,7 @@ char input[100];
 	
 	char c = comando[1];
 
-		
+	char *buf=NULL;	
 	
 	int fifo;
 
@@ -312,9 +312,11 @@ char input[100];
 		break;
 
 	
-	}
+	
 	
 	}
+
+}
 	return 0;
 }
 

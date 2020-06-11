@@ -62,7 +62,7 @@ int main(int argc, char * argv[]){
 
     fd = open("FIFO",O_RDONLY);
     printf("merdas\n");
-    while((r = read(fd,&buffer,SIZE)) > 0) {
+    while((r = read(fd,buffer,SIZE)) > 0) {
 
     			char * guarda = malloc(sizeof(strlen(buffer))-1);
     			int bytesaff = strlen(buffer);
@@ -107,15 +107,16 @@ int main(int argc, char * argv[]){
 
     			if((pid=fork())==0){
       	
-      			write(1,&buffer,r);
+      			write(1,buffer,r);
 
+            write(1,"para de printar merda crl\n", 30);
       			//printf("pid filho= %d\n", pid );
 
-      			printf("\n");
+      			//printf("\n");
 		
-					
+					//char ** pedidos = malloc(4*sizeof(char*));
 
-      			printf("tempoExec novo =%d\n", tempoExec );
+      			//printf("tempoExec novo =%d\n", tempoExec );
       			
       			
       			int z=  executa(buffer+1, tempoExec, tempoInat);

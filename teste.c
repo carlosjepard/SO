@@ -9,9 +9,10 @@
 
 int * pids;
 int pids_count=0;
-int timeout=0;
 int segundos=0;
 int completa = 0;
+int tempoExec = 100;
+int tempoInat =5;
 
 void sigalarm2_handler(int signum){
 
@@ -29,14 +30,14 @@ void sigalarm_handler(int signum){
 
 
 		if(pids[i]>0){
-			printf("killing grep %d\n", pids[i]);
+			//printf("killing grep %d\n", pids[i]);
 			kill(pids[i],SIGKILL);
 		}
 		
 		//write(1,"processo terminado\n",19);
 	}
 
-	printf("processo pai terminado %d\n",getpid());
+	//printf("processo pai terminado %d\n",getpid());
 		kill(getpid(),SIGKILL);
 
 
@@ -70,9 +71,11 @@ int parsecomand(char * comando, char * resultado[]){
 
 }
 
+// wc -c | ls -l | ze peter
 
+// wc -c | verificar | ls - | verificar | peter
 
-int executa (char * args,int tempoExec, int tempoInat){
+int main (int argc, char * args[]){
 
 	
 			if(signal(SIGALRM, sigalarm_handler)==SIG_ERR){
@@ -82,52 +85,33 @@ int executa (char * args,int tempoExec, int tempoInat){
 						exit(3);
 
 			}
-		
-		
-		//set detach-on-fork mode
-		write(1,args,strlen(args));
+	
 	//printf("tempoExec= %d\n", tempoExec );
 
 			alarm(tempoExec);
 
-	int quantos2=1;
-	for(int z =0; args[z]!='\0';z++){
-		if(args[z]=='|') quantos2++;
-	}
+	char * comando = args[2]; 
 
-	//printf("quantos2 = %d\n", quantos2 );
 	
-	write(1,"pisa\n", 5);
-	write(1,"12345\n",6);
-	char * ptr = strtok(args,"|");
+
+	char * ptr = strtok(comando,"|");
 
 	int quantos=0;
 
-	//write(1,"pisa\n", 5);
 
-	//DA MERDA AQUI
-
-	write(1,"zatao\n",6);
-	char **pedidos=malloc(64*sizeof(char*));
-
-
-
-
-
-	printf("merda 2\n");
+	char * pedidos[] = malloc(4*sizeof(char*));
 
 	while(ptr != NULL)
 	{	
-		//printf("merda\n");
+		
 		pedidos[quantos] = strdup(ptr);
 		ptr = strtok(NULL, "|");
 		quantos++;
-		printf("%s\n", pedidos[quantos-1] );
 	}
 	
 	
 
-	
+	pids_count=quantos;
 
 	//pids = (int*) malloc(sizeof(int)*quantos);
 	
@@ -142,7 +126,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 	if(quantos==1){
 
-		pids_count=1;
+
 		pids = (int*) malloc(sizeof(int)*quantos);
 
 			
@@ -176,7 +160,6 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 
 	quantos += (quantos -1);
-	pids_count=quantos;
 	pids = (int*) malloc(sizeof(int)*quantos);
 	int pipe_fdd[quantos-1][2];
 	
@@ -353,7 +336,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 			int bytes_read;
 			char zz[100];
 
-			//sleep(10);
+			sleep(10);
 			while((bytes_read=read(0,zz,100))>0){
 			write(1,zz,bytes_read);
 			//break;
@@ -405,5 +388,3 @@ int executa (char * args,int tempoExec, int tempoInat){
 	return 0;
 
 }
-
-

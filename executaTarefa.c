@@ -12,11 +12,13 @@ int pids_count=0;
 int timeout=0;
 int segundos=0;
 int completa = 0;
+int ret=0;
 
 void sigalarm2_handler(int signum){
 
 	write(1, "pipe anon nao anda da perna\n",28);
 	printf("VOU MATAR ESTE PID %d\n",getpid() );
+
 	kill(getpid(),SIGKILL);
 
 }
@@ -33,10 +35,11 @@ void sigalarm_handler(int signum){
 			kill(pids[i],SIGKILL);
 		}
 		
-		//write(1,"processo terminado\n",19);
+		write(1,"processo terminado\n",19);
 	}
 
 	printf("processo pai terminado %d\n",getpid());
+	ret=1;
 		kill(getpid(),SIGKILL);
 
 
@@ -46,7 +49,7 @@ void sigalarm_handler(int signum){
 
 
 
-int parsecomand(char * comando, char * resultado[]){
+void parsecomand(char * comando, char * resultado[]){
 
 
 	
@@ -331,16 +334,16 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 				if((pid=fork())==0){
 
-				if(signal(SIGALRM, sigalarm2_handler)==SIG_ERR){
+				/*if(signal(SIGALRM, sigalarm2_handler)==SIG_ERR){
 
 						perror("signal sigalarm2");	
 
 						exit(3);
 
 					}
-
+*/
 					alarm(tempoInat);
-
+					printf("tempo inat = %d\n", tempoInat);
 
 			dup2(pipe_fdd[i-1][0],0);
 			
@@ -353,7 +356,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 			int bytes_read;
 			char zz[100];
 
-			//sleep(10);
+			sleep(10);
 			while((bytes_read=read(0,zz,100))>0){
 			write(1,zz,bytes_read);
 			//break;
@@ -394,15 +397,17 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 	printf("j = %d\n", j);
 
+	int status;
 
 	for(int i=0;i<quantos;i++){
-		wait(NULL);
+		wait(&status);
+		if(WIFEXITED(status)==0) ret=2;
 		printf("PID acabou%d\n", pids[i]);
 	}
 
 	write(1,"caralhoooo\n",11);
 
-	return 0;
+	return ret;
 
 }
 

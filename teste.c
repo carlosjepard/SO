@@ -11,13 +11,13 @@ int * pids;
 int pids_count=0;
 int segundos=0;
 int completa = 0;
-int tempoExec = 100;
-int tempoInat =5;
+int tempoExec = 10;
+int tempoInat =4;
 
 void sigalarm2_handler(int signum){
 
 	write(1, "pipe anon nao anda da perna\n",28);
-	printf("VOU MATAR ESTE PID %d\n",getpid() );
+	//write(1, "pipe morto\n",10);
 	kill(getpid(),SIGKILL);
 
 }
@@ -99,7 +99,7 @@ int main (int argc, char * args[]){
 	int quantos=0;
 
 
-	char * pedidos[] = malloc(4*sizeof(char*));
+	char ** pedidos = malloc(4*sizeof(char*));
 
 	while(ptr != NULL)
 	{	
@@ -164,7 +164,7 @@ int main (int argc, char * args[]){
 	int pipe_fdd[quantos-1][2];
 	
 	for(int i=0; i<quantos;i++ ){
-		write(1,"passou aqui\n", 12);
+		//write(1,"passou aqui\n", 12);
 		
 		if(i==0){
 
@@ -208,7 +208,7 @@ int main (int argc, char * args[]){
 		
 		close(pipe_fdd[i][1]);
 		//pids[i]=pid;
-		write(1,"i==0\n",5);	
+		//write(1,"i==0\n",5);	
 	
 			}
 
@@ -253,7 +253,7 @@ int main (int argc, char * args[]){
 		close(pipe_fdd[i-1][0]);
 		//close(pipe_fdd[i][0]);
 		//pids[i]=pid;
-		write(1,"i==i-1\n",7);
+		//write(1,"i==i-1\n",7);
 
 		}
 		else if (i%2==0){
@@ -322,7 +322,8 @@ int main (int argc, char * args[]){
 
 					}
 
-					alarm(tempoInat);
+			
+			alarm(tempoInat);
 
 
 			dup2(pipe_fdd[i-1][0],0);
@@ -336,7 +337,7 @@ int main (int argc, char * args[]){
 			int bytes_read;
 			char zz[100];
 
-			sleep(10);
+			pause();
 			while((bytes_read=read(0,zz,100))>0){
 			write(1,zz,bytes_read);
 			//break;
@@ -356,7 +357,7 @@ int main (int argc, char * args[]){
 
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][1]);
-		write(1,"verificacao\n",12);
+		//write(1,"verificacao\n",12);
 		//pids[i]=pid;
 		
 

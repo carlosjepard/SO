@@ -120,9 +120,11 @@ int main(int argc, char * argv[]){
       			
       			
       			int z=  executa(buffer+1, tempoExec, tempoInat);
-      			//sleep(10);
 
-      			_exit(0);
+      			if(z==0){ write(1,"acabou com 0\n",13); _exit(1);} //normal
+            if(z==2){write(1,"acabou com 2\n",13); _exit(2);} //pipes anonumos tempo
+
+      			_exit(0); //tempo de exec acabou
 
       		}
 
@@ -131,19 +133,41 @@ int main(int argc, char * argv[]){
       			
 
       			//printf("pid = %d\n", pid );
-				
-      			wait(NULL);
+				  int status;
+          wait(&status);
+          //printf("WEXITSTATUS = %d\n", WEXITSTATUS(status));
+          int escrever = WEXITSTATUS(status);
 
       			
-				printf("pidzao = %d\n", pid );
+				    printf("pidzao = %d\n", pid );
 
-				while(minhaVez==1){
-					sleep(1);
-				}
+				    while(minhaVez==1){
+				    	sleep(1);
+			     	}
 
 				minhaVez=1;
-				bytesEscritos=write(fw,guarda,strlen(guarda));
-				printf("bytesEscritos filho = %d\n", bytesEscritos);
+
+        if(escrever==2){
+          char esc[bytesaff + 22];
+          strcpy(esc,"TEMPO DE INATIVIDADE: ");
+          strcat(esc,guarda);
+          bytesEscritos=write(fw,esc,strlen(esc));          
+        }
+        if(escrever==0){
+          char esc[bytesaff + 19];
+          strcpy(esc,"TEMPO DE EXECUCAO: ");
+          strcat(esc,guarda);
+          bytesEscritos=write(fw,esc,strlen(esc)); 
+        }
+        if(escrever==1){
+          char esc[bytesaff + 23];
+          strcpy(esc,"CONCLUIDO COM SUCESSO: ");
+          strcat(esc,guarda);
+          bytesEscritos=write(fw,esc,strlen(esc));
+        }
+
+				//bytesEscritos=write(fw,guarda,strlen(guarda));
+				//printf("bytesEscritos filho = %d\n", bytesEscritos);
 				minhaVez=0;
 
 		}
@@ -167,9 +191,9 @@ int main(int argc, char * argv[]){
     			}
     				minhaVez=1;
     				char * res = (char*) malloc(sizeof(100));
-
-    				while(read(fr,res,100)>0){
-    					write(1,res,strlen(res));
+            int ler;
+    				while((ler=read(fr,res,100))>0){
+    					write(1,res,ler);
     				}
 
     				lseek(fr,0,SEEK_SET);

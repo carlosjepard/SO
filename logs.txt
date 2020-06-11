@@ -1,0 +1,5 @@
+CONCLUIDO COM SUCESSO: cat teste.c | head -7
+TEMPO DE INATIVIDADE: cat teste.c | head -7
+CONCLUIDO COM SUCESSO: clear
+TEMPO DE EXECUCAO: cat teste.c | head -7
+CONCLUIDO COM SUCESSO: ps

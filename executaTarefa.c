@@ -13,19 +13,31 @@ int timeout=0;
 int segundos=0;
 int completa = 0;
 int ret=0;
+int zat=0;
 
 void sigalarm2_handler(int signum){
 
-	write(1, "pipe anon nao anda da perna\n",28);
-	printf("VOU MATAR ESTE PID %d\n",getpid() );
+	
+	for(int i=0; i<pids_count; i++){
+		
+		
 
-	kill(getpid(),SIGKILL);
+		if(pids[i]>0){
+			printf("killing grep %d\n", pids[i]);
+			kill(pids[i],SIGKILL);
+		}
+		_exit(3);
+		
+		
+	}
+
+
 
 }
 
 void sigalarm_handler(int signum){
 
-	write(1,"daniel\n",7);
+	
 
 	for(int i=0; i<pids_count; i++){
 		
@@ -86,11 +98,19 @@ int executa (char * args,int tempoExec, int tempoInat){
 						exit(3);
 
 			}
+
+			if(signal(SIGUSR1, sigalarm2_handler)==SIG_ERR){
+
+						perror("signal sigint");	
+
+						exit(4);
+
+			}
+
 		
 		
-		//set detach-on-fork mode
-		write(1,args,strlen(args));
-	//printf("tempoExec= %d\n", tempoExec );
+		
+	
 
 			alarm(tempoExec);
 
@@ -109,7 +129,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 	//DA MERDA AQUI
 
-	char **pedidos=malloc(64*sizeof(char*));
+	char **pedidos=malloc(quantos2*sizeof(char*));
 
 
 
@@ -123,22 +143,16 @@ int executa (char * args,int tempoExec, int tempoInat){
 		pedidos[quantos] = strdup(ptr);
 		ptr = strtok(NULL, "|");
 		quantos++;
-		printf("%s\n", pedidos[quantos-1] );
+		
 	}
 	
 	
 
 	
 
-	//pids = (int*) malloc(sizeof(int)*quantos);
 	
 	int pid;
 
-	//alarm(tempoExec);
-	//int i;
-	//while((segundos<tempoExec) && (completa == 0)){
-
-	//alarm(tempoExec);
 	int j=-1;
 
 	if(quantos==1){
@@ -182,7 +196,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 	int pipe_fdd[quantos-1][2];
 	
 	for(int i=0; i<quantos;i++ ){
-		write(1,"passou aqui\n", 12);
+		//write(1,"passou aqui\n", 12);
 		
 		if(i==0){
 
@@ -226,7 +240,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 		
 		close(pipe_fdd[i][1]);
 		//pids[i]=pid;
-		write(1,"i==0\n",5);	
+		//write(1,"i==0\n",5);	
 	
 			}
 
@@ -259,6 +273,10 @@ int executa (char * args,int tempoExec, int tempoInat){
 			parsecomand(pedidos[j], respostas);
 
 			//sleep(10);
+
+
+			//ESTE E O ULTIMO EXEC DE QUALQUER TAREFA COM PIPES. TENS DE REDIRECIONAR O STDOUT(1) PARA O EXTREMO DE ESCRITA DO PIPE COM NOME ->FIFO2
+			//TENS DE FAZER UM DUP IGUAL AO QUE FIZ NA LINHA 264 MAS DESTE GENERO( dup2(extremo de escrita,1) )
 			execvp(respostas[0], respostas);
 
 			//printf("gil\n");
@@ -271,7 +289,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 		close(pipe_fdd[i-1][0]);
 		//close(pipe_fdd[i][0]);
 		//pids[i]=pid;
-		write(1,"i==i-1\n",7);
+		//write(1,"i==i-1\n",7);
 
 		}
 		else if (i%2==0){
@@ -317,7 +335,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][1]);
-		write(1,"i==i\n",5);
+		//write(1,"i==i\n",5);
 		//pids[i]=pid;
 		
 
@@ -359,7 +377,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 			
 			alarm(tempoInat);
 
-			sleep(10);
+			sleep(20);
 
 			while((bytes_read=read(0,zz,100))>0){
 				write(1,zz,bytes_read);
@@ -376,7 +394,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][1]);
-		write(1,"verificacao\n",12);
+		//write(1,"verificacao\n",12);
 		
 		//pids[i]=pid;
 		
@@ -407,6 +425,13 @@ int executa (char * args,int tempoExec, int tempoInat){
 	}
 
 	write(1,"caralhoooo\n",11);
+
+
+	if(zat==1){
+		write(1,"zat=1\n",6);
+		return 3;
+
+	} 
 
 	return ret;
 

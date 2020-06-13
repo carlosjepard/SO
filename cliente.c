@@ -21,6 +21,8 @@ int main(int argc, char * argv[]){
 	char b;
 	char input[100];
 
+
+//O SERVIDOR QUANDO COMECA ABRE UM PIPE PARA OUVIR E OUTRO PARA ESCREVER. TENS DE METER O CLIENTE A OUVIR O SERVIDOOR. PODES TER DE USAR FORKS, MAS N SEI
 // executar cut -f7 -d: /etc/passwd | uniq | wc -l
 	
 
@@ -36,13 +38,15 @@ int main(int argc, char * argv[]){
 			do{
 				i=0;
 
-			while(read(0,&b,1)!=0 && b!='\n'){
+			while((read(0,&b,1)>0) && b!='\n'){
 				input[i]=b;
 				i++;
 			}
 			input[i]='\0';
 				
+				//write(1,input,strlen(input));
 				command = strtok(input, " ");
+				write(1,input,strlen(input));
 							
 
 				if(strcmp(command,"tempo-inactividade")==0){ 
@@ -57,6 +61,8 @@ int main(int argc, char * argv[]){
 					command=strtok(NULL,"\n");
 					printf("222=%s\n", command );
 					strcpy(buf+1, command);
+
+					write(1,"pedrinha\n",9);
 					
 					write(fd,buf,strlen(buf)+1);
 
@@ -326,33 +332,64 @@ int main(int argc, char * argv[]){
 
 		break;
 
+		case('l'):
+			
+
+			if((fd=open("FIFO",O_WRONLY))<0){
+				perror("open");
+			}
+
+			printf("Tarefas em exec\n");
+			
+			buf = malloc(1);
+
+			buf = "l";
+
+			
+
+
+
+			//while((r = read(0,buf,SIZE)) > 0) {
+     	 		
+     	 		write(fd,buf,strlen(buf)+1);
+            
+   			 //}
+
+		break;
+
+		case('t'):
+			
+
+			if((fd=open("FIFO",O_WRONLY))<0){
+				perror("open");
+			}
+
+			printf("Terminar Tarefa %s\n", argv[2]);
+			
+			buf = malloc(1+strlen(argv[2]));
+
+			strcpy(buf,"t");
+			strcat(buf,argv[2]);
+
+			printf("%s\n", buf);
+
+
+
+			//while((r = read(0,buf,SIZE)) > 0) {
+     	 		
+     	 		write(fd,buf,strlen(buf)+1);
+            
+   			 //}
+
+		break;
+
+
 	
 	}
+
+
 	
 	}
 	return 0;
 }
 
-/*
-	while((r = read(fd,&buffer,SIZE)) > 0) {
-      write(1,&buffer,r);
-      sscanf(buffer,"%d\t%[^\n]s",&pid,command); // PID and command are OK
-      // server handles at maximun 5 request simultaneously
-      if(running < FORKS) {
-        running++;
-        if(fork() == 0) {
-          // creates a child process to process request
-          processRequest(pid,command);
-          _exit(1);
-        } else if(running >= FORKS) {
-          wait(0);
-          running--;
-        }
-      }
-
-    }
-    close(fd);
-  }
-  return 0;
-}
-*/

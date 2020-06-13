@@ -35,6 +35,7 @@ int main(int argc, char * argv[]){
 	registo.terminadas= malloc(20*sizeof(char*));
 	registo.execucao=malloc(20*sizeof(char*));
 
+  char * teste[100];
 
 	int fifo_fd=-1;
 
@@ -56,6 +57,10 @@ int main(int argc, char * argv[]){
 	int fw=open("logs.txt",O_WRONLY|O_CREAT|O_TRUNC,0600);
 	int fr=open("logs.txt",O_RDONLY,0600);
 
+  //int ew=open("execucao.txt",O_WRONLY|O_CREAT|O_TRUNC,0600);
+  //int er=open("execucao.txt",O_RDONLY,0600);
+
+
 	while(1) {
 
 
@@ -66,6 +71,7 @@ int main(int argc, char * argv[]){
 
     			char * guarda = malloc(sizeof(strlen(buffer))-1);
     			int bytesaff = strlen(buffer);
+          strcpy(teste[0],buffer);
 
     			if(buffer[0]=='m'){
     				strcpy(guarda,buffer+1);
@@ -85,7 +91,7 @@ int main(int argc, char * argv[]){
 
 		    	if(fork()==0){
 
-    			
+    //			strcpy(teste[0],"daniel");
 
     			int pid;
 
@@ -109,20 +115,11 @@ int main(int argc, char * argv[]){
       	
       			write(1,buffer,r);
 
-            write(1,"para de printar merda crl\n", 30);
-      			//printf("pid filho= %d\n", pid );
-
-      			//printf("\n");
-		
-					//char ** pedidos = malloc(4*sizeof(char*));
-
-      			//printf("tempoExec novo =%d\n", tempoExec );
-      			
-      			
+            
       			int z=  executa(buffer+1, tempoExec, tempoInat);
 
       			if(z==0){ write(1,"acabou com 0\n",13); _exit(1);} //normal
-            if(z==2){write(1,"acabou com 2\n",13); _exit(2);} //pipes anonumos tempo
+            if(z==2){ write(1,"acabou com 2\n",13); _exit(2);} //pipes anonumos tempo
 
       			_exit(0); //tempo de exec acabou
 
@@ -244,11 +241,7 @@ int main(int argc, char * argv[]){
    		
    				_exit(0);
    		}
-
-
-   			ter++;
-   			
-   			
+     ter++;
 		}
 		
 

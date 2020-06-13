@@ -25,6 +25,7 @@ void sigalarm2_handler(int signum){
 
 void sigalarm_handler(int signum){
 
+	write(1,"daniel\n",7);
 
 	for(int i=0; i<pids_count; i++){
 		
@@ -77,7 +78,7 @@ void parsecomand(char * comando, char * resultado[]){
 
 int executa (char * args,int tempoExec, int tempoInat){
 
-	
+	//pai
 			if(signal(SIGALRM, sigalarm_handler)==SIG_ERR){
 
 						perror("signal sigalarm");	
@@ -100,8 +101,6 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 	//printf("quantos2 = %d\n", quantos2 );
 	
-	write(1,"pisa\n", 5);
-	write(1,"12345\n",6);
 	char * ptr = strtok(args,"|");
 
 	int quantos=0;
@@ -110,7 +109,6 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 	//DA MERDA AQUI
 
-	write(1,"zatao\n",6);
 	char **pedidos=malloc(64*sizeof(char*));
 
 
@@ -334,6 +332,8 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 				if((pid=fork())==0){
 
+
+
 				/*if(signal(SIGALRM, sigalarm2_handler)==SIG_ERR){
 
 						perror("signal sigalarm2");	
@@ -342,8 +342,8 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 					}
 */
-					alarm(tempoInat);
-					printf("tempo inat = %d\n", tempoInat);
+					//alarm(tempoInat);
+					//printf("tempo inat = %d\n", tempoInat);
 
 			dup2(pipe_fdd[i-1][0],0);
 			
@@ -356,27 +356,28 @@ int executa (char * args,int tempoExec, int tempoInat){
 			int bytes_read;
 			char zz[100];
 
+			
+			alarm(tempoInat);
+
 			sleep(10);
+
 			while((bytes_read=read(0,zz,100))>0){
-			write(1,zz,bytes_read);
-			//break;
+				write(1,zz,bytes_read);
+				alarm(tempoInat);
+			
 			}
 
-			
 				//write(1,zz,bytes_read);
 
-			
 
 			_exit(1);
 
 		}
 
-		
-
-
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][1]);
 		write(1,"verificacao\n",12);
+		
 		//pids[i]=pid;
 		
 

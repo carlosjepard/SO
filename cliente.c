@@ -11,22 +11,30 @@
 #define INPUT_BUFFER_SIZE (64)
 #define QUIT_STRING "q"
 
+
 int main(int argc, char * argv[]){
 
-int fd;
-char *buf=NULL;
-char b;
-char input[100];
+	int fd;
 	
+
+	char *buf=NULL;	
+	char b;
+	char input[100];
+
+// executar cut -f7 -d: /etc/passwd | uniq | wc -l
+	
+
 	if(argc == 1){
 		printf("Bem vindo\n");
-		printf("Ira introduzir os pedidos por aqui\n");
+		printf("Ira introduzir os pedidos por aqui (q para sair)\n");
 
-		
+
+  		
     		char *command;
     		int i;
 
 			do{
+				i=0;
 
 			while(read(0,&b,1)!=0 && b!='\n'){
 				input[i]=b;
@@ -37,7 +45,7 @@ char input[100];
 				command = strtok(input, " ");
 							
 
-			/*	if(strcmp(command,"tempo-inactividade")==0){ 
+				if(strcmp(command,"tempo-inactividade")==0){ 
 
 					buf= malloc(1+strlen(input));
 
@@ -47,6 +55,7 @@ char input[100];
 
 					strcpy(buf,"i");
 					command=strtok(NULL,"\n");
+					printf("222=%s\n", command );
 					strcpy(buf+1, command);
 					
 					write(fd,buf,strlen(buf)+1);
@@ -64,14 +73,17 @@ char input[100];
 					}
 
 					strcpy(buf,"m");
+
 					command=strtok(NULL,"\n");
+					printf("222=%s\n", command );
+
 					strcpy(buf+1, command);
 
 					write(fd,buf,strlen(buf)+1);
 
 					
 					}
-					*/
+					
 				
 				 if(strcmp(command,"executar")==0){
 
@@ -96,8 +108,8 @@ char input[100];
 
 					}
 
-/*
-				else if(strcmp(command,"listar\n")==0){
+
+				else if(strcmp(command,"listar")==0){
 
 					buf= malloc(1+strlen(input));
 
@@ -107,6 +119,7 @@ char input[100];
 
 					strcpy(buf,"l");
 					
+
 
 					write(fd,buf,strlen(buf)+1);
 
@@ -122,13 +135,16 @@ char input[100];
 					} 
 
 					strcpy(buf,"t");
+
 					command=strtok(NULL,"\n");
+
+					printf("222=%s\n", command );
 					strcpy(buf+1, command);
 
 					write(fd,buf,strlen(buf)+1);
 
 				}
-*/
+
 
 				else if(strcmp(command,"historico")==0){
 
@@ -142,8 +158,7 @@ char input[100];
 					
 
 					write(fd,buf,strlen(buf)+1);
-
-					}				
+				}				
 
 				else if(strcmp(command,"ajuda")==0){
 
@@ -161,7 +176,7 @@ char input[100];
 
 				
 
-		}while ((command == NULL) || strcmp(command, QUIT_STRING) != 0);
+		}while (strcmp(command, QUIT_STRING) != 0);
 
 		if (NULL != command)
     {
@@ -169,9 +184,10 @@ char input[100];
     }
 
   
-	} else{
+	
 
-	int fd;
+}else{
+
 
 	int r=0;
 
@@ -179,9 +195,8 @@ char input[100];
 	
 	char c = comando[1];
 
-	char *buf=NULL;	
-	
 	int fifo;
+
 
 	//mkfifo("FIFO",0666);
 
@@ -258,6 +273,7 @@ char input[100];
 		break;
 
 
+
 		case('m'):
 			
 
@@ -283,7 +299,6 @@ char input[100];
    			 //}
 
 		break;
-
 
 		case('i'):
 			
@@ -312,11 +327,9 @@ char input[100];
 		break;
 
 	
-	
+	}
 	
 	}
-
-}
 	return 0;
 }
 

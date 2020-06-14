@@ -15,6 +15,7 @@ int segundos=0;
 int completa = 0;
 int ret=0;
 int zat=0;
+int servidor;
 
 void sigalarm2_handler(int signum){
 
@@ -27,6 +28,9 @@ void sigalarm2_handler(int signum){
 			printf("killing grep %d\n", pids[i]);
 			kill(pids[i],SIGKILL);
 		}
+
+		kill(getpid(),SIGKILL);
+
 		_exit(3);
 		
 		
@@ -52,13 +56,18 @@ void sigalarm_handler(int signum){
 		write(1,"processo terminado\n",19);
 	}
 
+	
+	kill(servidor,SIGUSR1);
+
 	printf("processo pai terminado %d\n",getpid());
-	ret=1;
+	//ret=1;
 		kill(getpid(),SIGKILL);
 
 
 	
-}  
+} 
+
+
 
 
 
@@ -89,9 +98,11 @@ void parsecomand(char * comando, char * resultado[]){
 
 
 
-int executa (char * args,int tempoExec, int tempoInat){
+int executa (char * args,int tempoExec, int tempoInat, int servpid){
 
-	//pai
+	//pisa
+	servidor=servpid;
+
 			if(signal(SIGALRM, sigalarm_handler)==SIG_ERR){
 
 						perror("signal sigalarm");	
@@ -271,9 +282,9 @@ int executa (char * args,int tempoExec, int tempoInat){
 			
 			close(pipe_fdd[i-1][0]);
 			
-			//int fd2=open("FIFO2",O_WRONLY);
+			int fd2=open("FIFO2",O_WRONLY);
 
-			//dup2(fd2,1);
+			dup2(fd2,1);
 			
 			//sleep(15);
 
@@ -291,7 +302,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 			execvp(respostas[0], respostas);
 
-//			close(fd2);
+			close(fd2);
 
 			//printf("gil\n");
 
@@ -301,9 +312,6 @@ int executa (char * args,int tempoExec, int tempoInat){
 		
 		
 		close(pipe_fdd[i-1][0]);
-		//close(pipe_fdd[i][0]);
-		//pids[i]=pid;
-		//write(1,"i==i-1\n",7);
 
 		}
 		else if (i%2==0){
@@ -366,14 +374,14 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 
 
-				/*if(signal(SIGALRM, sigalarm2_handler)==SIG_ERR){
+				if(signal(SIGALRM, sigalarm2_handler)==SIG_ERR){
 
 						perror("signal sigalarm2");	
 
 						exit(3);
 
 					}
-*/
+
 					//alarm(tempoInat);
 					//printf("tempo inat = %d\n", tempoInat);
 
@@ -408,9 +416,6 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][1]);
-		//write(1,"verificacao\n",12);
-		
-		//pids[i]=pid;
 		
 
 

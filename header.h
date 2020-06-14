@@ -2,4 +2,4 @@
 
 
 
-int executa (char * args, int tempoExec, int tempoInat);
+int executa (char * args, int tempoExec, int tempoInat, int servpid);

@@ -26,16 +26,17 @@ void hdl(int sig, siginfo_t * siginfo, void *context){
 
 
     int j=0;
-
+    printf("VOU RETIRAR UM PROCESSO DE EXEC\n");
     char * pidString = malloc(sizeof(char*));
     int value = siginfo->si_pid;
     snprintf(pidString, 10, "%d", value);
 
 
+
   for(j;j<exe;j++){
 
     if(strstr(execucao[j],pidString) != NULL) {
-      //execucao[j]='\0';
+      execucao[j]='\0';
       break;
   }
     
@@ -47,13 +48,20 @@ void hdl(int sig, siginfo_t * siginfo, void *context){
 
   exe--;
   
-
-  
-
   
 }
 
+void signalHandler(int signal)
+{
+  printf("Cought signal %d!\n",signal);
+  wait(NULL);
+  
+}
 
+void signalIGNORA(int signal)
+{
+  write(1,"nada\n",5);
+}
 
 //registo.terminadas= malloc(20*sizeof(char*));
 //registo.execucao=malloc(20*sizeof(char*));
@@ -85,6 +93,16 @@ int main(int argc, char * argv[]){
 
       }
 
+
+
+  if(signal(SIGCHLD, signalHandler)==SIG_ERR){
+
+            perror("signal SIGCHLDERRO");  
+
+            exit(3);
+
+      }
+
 	
 	
 
@@ -100,8 +118,11 @@ int main(int argc, char * argv[]){
 	mkfifo("FIFO",0666);
   
 
-  //ESTE E O PIPE PARA ESCREVER PARA O CLIENTE
+  //ESTE E O PIPE PARA ESCREVER PARA O CLIENTE tarefas
   mkfifo("FIFO2",0666);
+
+  //ESTE PIPE ESCREVE RESPOSTAS IMEDIATAS
+  //mkfifo("FIFO3",0666);
 
 
   	// keeps reading from the named pipe
@@ -162,6 +183,14 @@ int main(int argc, char * argv[]){
 
 		    	if(fork()==0){
 
+            if(signal(SIGCHLD, signalIGNORA)==SIG_ERR){
+
+            perror("signal sigalarm");  
+
+            exit(3);
+
+      }
+
         close(pipe_paiFilho[0]);
 
     			int pid;
@@ -216,15 +245,16 @@ int main(int argc, char * argv[]){
 
 
             
-      			int z=  executa(buffer+1, tempoExec, tempoInat);
+      			int z=  executa(buffer+1, tempoExec, tempoInat,servpid);
 
             kill(servpid,SIGUSR1);
 
-      			if(z==0){ write(1,"acabou com 0\n",13); _exit(1);} //normal
-            if(z==2){ write(1,"acabou com 2\n",13); _exit(2);} //pipes anonumos tempo
-            if(z==3){ write(1,"acabou com 3\n",13); _exit(3);}
+      			if(z==0){ printf("saiu com 0\n"); _exit(1);} //normal
+            if(z==2){ printf("saiu com 2\n"); _exit(2);} //pipes anonumos tempo
+            //if(z==3){ kill(servpid,SIGUSR1); _exit(3);}
 
-            
+            printf("Z= %d\n", z);
+
       			_exit(0); //tempo de exec acabou
 
       		}
@@ -243,6 +273,7 @@ int main(int argc, char * argv[]){
           //printf("WEXITSTATUS = %d\n", WEXITSTATUS(status));
           int escrever = WEXITSTATUS(status);
 
+
       			
 				    printf("pidzao = %d\n", pid );
 
@@ -250,7 +281,9 @@ int main(int argc, char * argv[]){
 				    	sleep(1);
 			     	}
 
-				
+            printf("escrever= %d\n", escrever);
+
+				minhaVez=1;
         if(escrever==2){
           char esc[bytesaff + 22];
           strcpy(esc,"TEMPO DE INATIVIDADE: ");
@@ -267,10 +300,13 @@ int main(int argc, char * argv[]){
           char esc[bytesaff + 23];
           strcpy(esc,"CONCLUIDO COM SUCESSO: ");
           strcat(esc,guarda);
+          write(1,"chegou\n",7);
           bytesEscritos=write(fw,esc,strlen(esc));
         }
 
 				minhaVez=0;
+
+        write(1,"pisadela\n",9);
 
 		}
 
@@ -301,16 +337,15 @@ int main(int argc, char * argv[]){
 
     			else{
 
-    			while(minhaVez==1){
-    				sleep(1);
-    			}
-    				minhaVez=1;
+    			
+    				
     				char * res = (char*) malloc(sizeof(100));
             int ler;
 
             if((fd2=open("FIFO2",O_WRONLY))<0){
                 perror("open");
               }
+
     				while((ler=read(fr,res,1000))>0){
               //AQUI TENS DE ESCREVER PARA O CLIENTE TMB
 
@@ -407,6 +442,7 @@ int main(int argc, char * argv[]){
               
              
               write(fd2,str1,strlen(str1)+1);
+              close(fd2);
               //free(str1);
 
             } 
@@ -454,7 +490,8 @@ int main(int argc, char * argv[]){
    		
    			}
 
-   		
+
+   		     //kill(getppid(),SIGCHLD);
    				_exit(0);
    		}
 

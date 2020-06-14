@@ -19,6 +19,7 @@ int main(int argc, char * argv[]){
 	int fd;
 	int fd2;
 	int r;
+	int fd3;
 
 	char *buf=NULL;	
 	char b;
@@ -63,7 +64,34 @@ int main(int argc, char * argv[]){
 
     			}
 
+
+
+
+
     		}
+
+    		/*if(fork()==0){
+
+    			fd3 = open("FIFO3",O_RDONLY);
+
+    			char * resp = (char*) malloc(sizeof(1024));
+
+    			while(1){
+
+
+					
+
+						while((r = read(fd3,resp,1024)) > 0) {
+
+							write(1,resp,r);
+						
+					}
+
+
+    			}
+
+    		}
+    		*/
 
 			do{
 				i=0;
@@ -99,6 +127,8 @@ int main(int argc, char * argv[]){
 					
 					write(fd,buf,strlen(buf)+1);
 
+					//close(fd);
+
 					}
 			
 
@@ -119,6 +149,8 @@ int main(int argc, char * argv[]){
 					strcpy(buf+1, command);
 
 					write(fd,buf,strlen(buf)+1);
+
+					//close(fd);
 
 					
 					}
@@ -147,6 +179,8 @@ int main(int argc, char * argv[]){
 
 					write(fd,buf,strlen(buf)+1);
 
+					//close(fd);
+
 					
 					
 
@@ -173,6 +207,8 @@ int main(int argc, char * argv[]){
 
 					write(fd,buf,strlen(buf)+1);
 
+					//close(fd);
+
 
 					
 
@@ -196,6 +232,7 @@ int main(int argc, char * argv[]){
 
 					write(fd,buf,strlen(buf)+1);
 
+					//close(fd);
 
 
 				}
@@ -214,7 +251,7 @@ int main(int argc, char * argv[]){
 
 					write(fd,buf,strlen(buf)+1);
 
-					
+					//close(fd);
 					
 				}				
 
@@ -288,7 +325,7 @@ int main(int argc, char * argv[]){
      	 		write(fd,buf,strlen(buf)+1);
 
 
-
+     	 		
      	 		fd2 = open("FIFO2",O_RDONLY);
 						while((r = read(fd2,buffer,SIZE)) > 0) {
 

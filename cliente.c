@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
+
 
 
 #define SIZE 1024
@@ -24,7 +26,7 @@ int main(int argc, char * argv[]){
 	char buffer[1024];
 
 //O SERVIDOR QUANDO COMECA ABRE UM PIPE PARA OUVIR E OUTRO PARA ESCREVER. TENS DE METER O CLIENTE A OUVIR O SERVIDOOR. PODES TER DE USAR FORKS, MAS N SEI
-// executar cut -f7 -d: /etc/passwd | uniq | wc -l
+// executar cut -f7 -d: /etc/passwd | uniq | wc -listar
 //o zat?	
 
 	
@@ -36,8 +38,32 @@ int main(int argc, char * argv[]){
 
 
   		
-    		char *command;
+    		char *command = (char*) malloc(1024) ;
     		int i;
+
+
+
+    		if(fork()==0){
+
+    			fd2 = open("FIFO2",O_RDONLY);
+
+    			char * resp = (char*) malloc(sizeof(1024));
+
+    			while(1){
+
+
+					
+
+						while((r = read(fd2,resp,1024)) > 0) {
+
+							write(1,resp,r);
+						
+					}
+
+
+    			}
+
+    		}
 
 			do{
 				i=0;
@@ -48,9 +74,12 @@ int main(int argc, char * argv[]){
 			}
 			input[i]='\0';
 				
-				//write(1,input,strlen(input));
+				command = NULL;
+
+				write(1,"passou aqui\n",12);
 				command = strtok(input, " ");
-				write(1,input,strlen(input));
+				write(1,command,strlen(input));
+				write(1,"\n",1);
 							
 
 				if(strcmp(command,"tempo-inactividade")==0){ 
@@ -95,7 +124,9 @@ int main(int argc, char * argv[]){
 					}
 					
 				
-				 if(strcmp(command,"executar")==0){
+				 else if(strcmp(command,"executar")==0){
+
+				 	
 
 					buf= malloc(1+strlen(input));
 
@@ -116,7 +147,16 @@ int main(int argc, char * argv[]){
 
 					write(fd,buf,strlen(buf)+1);
 
-					}
+					
+					
+
+					
+					
+
+					//wait(NULL);
+
+				}
+
 
 
 				else if(strcmp(command,"listar")==0){
@@ -134,13 +174,7 @@ int main(int argc, char * argv[]){
 					write(fd,buf,strlen(buf)+1);
 
 
-					fd2 = open("FIFO2",O_RDONLY);
-					printf("estou a ouvir\n");
-						while((r = read(fd2,buffer,SIZE)) > 0) {
-
-							write(1,buffer,strlen(buffer)+1);
-						
-					}
+					
 
 				}
 
@@ -181,13 +215,7 @@ int main(int argc, char * argv[]){
 					write(fd,buf,strlen(buf)+1);
 
 					
-					fd2 = open("FIFO2",O_RDONLY);
-					printf("estou a ouvir\n");
-						while((r = read(fd2,buffer,SIZE)) > 0) {
-
-							write(1,buffer,strlen(buffer)+1);
-						
-					}
+					
 				}				
 
 				else if(strcmp(command,"ajuda")==0){
@@ -258,6 +286,15 @@ int main(int argc, char * argv[]){
 			//while((r = read(0,buf,SIZE)) > 0) {
      	 		
      	 		write(fd,buf,strlen(buf)+1);
+
+
+
+     	 		fd2 = open("FIFO2",O_RDONLY);
+						while((r = read(fd2,buffer,SIZE)) > 0) {
+
+							write(1,buffer,strlen(buffer)+1);
+						
+					}
             
    			 //}
 
@@ -302,7 +339,7 @@ int main(int argc, char * argv[]){
      	 		write(fd,buf,strlen(buf)+1);
 
      	 		fd2 = open("FIFO2",O_RDONLY);
-				printf("estou a ouvir\n");
+				
 						while((r = read(fd2,buffer,SIZE)) > 0) {
 
 							write(1,buffer,strlen(buffer)+1);
@@ -389,7 +426,6 @@ int main(int argc, char * argv[]){
      	 		write(fd,buf,strlen(buf)+1);
 
      	 		fd2 = open("FIFO2",O_RDONLY);
-				printf("estou a ouvir\n");
 						while((r = read(fd2,buffer,SIZE)) > 0) {
 
 							write(1,buffer,strlen(buffer)+1);

@@ -3,6 +3,7 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 #include "header.h"
 
 
@@ -167,6 +168,11 @@ int executa (char * args,int tempoExec, int tempoInat){
 			
 			char * respostas[10];
 
+			int fd2=open("FIFO2",O_WRONLY);
+
+			dup2(fd2,1);
+
+
 
 			parsecomand(pedidos[0], respostas);
 
@@ -174,6 +180,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 			
 			execvp(respostas[0], respostas);
 
+			close(fd2);
 
 			_exit(1);
 
@@ -220,7 +227,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 			close(pipe_fdd[i][1]);
 			
 
-			//sleep(10);
+			sleep(10);
 		
 
 			char * respostas[10];
@@ -264,6 +271,9 @@ int executa (char * args,int tempoExec, int tempoInat){
 			
 			close(pipe_fdd[i-1][0]);
 			
+			//int fd2=open("FIFO2",O_WRONLY);
+
+			//dup2(fd2,1);
 			
 			//sleep(15);
 
@@ -280,6 +290,8 @@ int executa (char * args,int tempoExec, int tempoInat){
 			
 
 			execvp(respostas[0], respostas);
+
+//			close(fd2);
 
 			//printf("gil\n");
 
@@ -379,7 +391,7 @@ int executa (char * args,int tempoExec, int tempoInat){
 			
 			alarm(tempoInat);
 
-			sleep(20);
+			//sleep(10);
 
 			while((bytes_read=read(0,zz,100))>0){
 				write(1,zz,bytes_read);

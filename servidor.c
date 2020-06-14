@@ -35,7 +35,7 @@ void hdl(int sig, siginfo_t * siginfo, void *context){
   for(j;j<exe;j++){
 
     if(strstr(execucao[j],pidString) != NULL) {
-      execucao[j]='\0';
+      //execucao[j]='\0';
       break;
   }
     
@@ -307,19 +307,23 @@ int main(int argc, char * argv[]){
     				minhaVez=1;
     				char * res = (char*) malloc(sizeof(100));
             int ler;
-    				while((ler=read(fr,res,100))>0){
-              //AQUI TENS DE ESCREVER PARA O CLIENTE TMB
 
-              if((fd2=open("FIFO2",O_WRONLY))<0){
+            if((fd2=open("FIFO2",O_WRONLY))<0){
                 perror("open");
               }
-              
-             
-              write(fd2,res,strlen(res)+1);
+    				while((ler=read(fr,res,1000))>0){
+              //AQUI TENS DE ESCREVER PARA O CLIENTE TMB
 
+              
+
+              write(fd2,res,ler);
+              
+            } 
+              
+            close(fd2);
 
     					//write(1,res,ler);
-    				}
+    				
 
     				lseek(fr,0,SEEK_SET);
 
@@ -403,7 +407,7 @@ int main(int argc, char * argv[]){
               
              
               write(fd2,str1,strlen(str1)+1);
-              free(str1);
+              //free(str1);
 
             } 
 

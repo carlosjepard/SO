@@ -95,7 +95,7 @@ int main(int argc, char * argv[]){
 	int fifo_fd=-1;
 
 
-
+  int fd2;
 	int fd;
 	mkfifo("FIFO",0666);
   
@@ -119,7 +119,8 @@ int main(int argc, char * argv[]){
 
 	int fw=open("logs.txt",O_WRONLY|O_CREAT|O_TRUNC,0600);
 	int fr=open("logs.txt",O_RDONLY,0600);
-
+  char *aux;
+  char *str1;
 
 
 	while(1) {
@@ -285,10 +286,16 @@ int main(int argc, char * argv[]){
 
       
 
-    		printf("REGISTOS DE TAREFAS CONCLUDIAS\n");
+    		//printf("REGISTOS DE TAREFAS CONCLUDIAS\n");
 
     			if(ter==0){
-    				printf("Nao existem registos de tarefas concluidas\n");
+
+            if((fd2=open("FIFO2",O_WRONLY))<0){
+                perror("open");
+              }
+              aux="Nao existem registos de tarefas concluidas\n";
+              write(fd2,aux,strlen(aux)+1);
+    			
     				
     			}
 
@@ -302,7 +309,16 @@ int main(int argc, char * argv[]){
             int ler;
     				while((ler=read(fr,res,100))>0){
               //AQUI TENS DE ESCREVER PARA O CLIENTE TMB
-    					write(1,res,ler);
+
+              if((fd2=open("FIFO2",O_WRONLY))<0){
+                perror("open");
+              }
+              
+             
+              write(fd2,res,strlen(res)+1);
+
+
+    					//write(1,res,ler);
     				}
 
     				lseek(fr,0,SEEK_SET);
@@ -349,10 +365,16 @@ int main(int argc, char * argv[]){
 
       
 
-        printf("Tarefas em execucao\n");
+        //printf("Tarefas em execucao\n");
 
           if(exe==0){
-            printf("Nao existem tarefas em execucao\n");
+             aux="Nao existem tarefas em execucao\n";
+            if((fd2=open("FIFO2",O_WRONLY))<0){
+                perror("open");
+              }
+              
+             
+              write(fd2,aux,strlen(aux)+1);
             
           }
 
@@ -364,8 +386,26 @@ int main(int argc, char * argv[]){
             
             for(int i=0;i<exe;i++){
               //AQUI TENS DE ESCREVER PARA O CLIENTE TMB
-              printf("%d: %s\n",i+1,execucao[i]);
-            }
+              //printf("%d: %s\n",i+1,execucao[i]);
+
+
+            int length = snprintf( NULL, 0, "%d", i+1 );
+            str1 = malloc( length + 1 );
+            snprintf(str1, length + 1, "%d", i+1 );
+            
+              strcat(str1,": ");
+              strcat(str1,execucao[i]);
+              strcat(str1,"\n");
+             
+                if((fd2=open("FIFO2",O_WRONLY))<0){
+                perror("open");
+              }
+              
+             
+              write(fd2,str1,strlen(str1)+1);
+              free(str1);
+
+            } 
 
           } 
 
@@ -397,7 +437,15 @@ int main(int argc, char * argv[]){
           close(pipe_paiFilho[1]);
 
           //AQUI TENS DE ESCREVER PARA O CLIENTE TMB MAS E CAGATIVO. 
-    			printf("nao percebi o comando\n");
+    			aux="nao percebi o comando\n";
+
+           if((fd2=open("FIFO2",O_WRONLY))<0){
+                perror("open");
+              }
+              
+             
+              write(fd2,aux,strlen(aux)+1);
+
     			break;
    		
    			}

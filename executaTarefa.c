@@ -277,6 +277,8 @@ int executa (char * args,int tempoExec, int tempoInat){
 
 			//ESTE E O ULTIMO EXEC DE QUALQUER TAREFA COM PIPES. TENS DE REDIRECIONAR O STDOUT(1) PARA O EXTREMO DE ESCRITA DO PIPE COM NOME ->FIFO2
 			//TENS DE FAZER UM DUP IGUAL AO QUE FIZ NA LINHA 264 MAS DESTE GENERO( dup2(extremo de escrita,1) )
+			
+
 			execvp(respostas[0], respostas);
 
 			//printf("gil\n");

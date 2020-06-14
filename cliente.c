@@ -15,16 +15,20 @@
 int main(int argc, char * argv[]){
 
 	int fd;
-	
+	int fd2;
+	int r;
 
 	char *buf=NULL;	
 	char b;
 	char input[100];
-
+	char buffer[1024];
 
 //O SERVIDOR QUANDO COMECA ABRE UM PIPE PARA OUVIR E OUTRO PARA ESCREVER. TENS DE METER O CLIENTE A OUVIR O SERVIDOOR. PODES TER DE USAR FORKS, MAS N SEI
 // executar cut -f7 -d: /etc/passwd | uniq | wc -l
+//o zat?	
+
 	
+		
 
 	if(argc == 1){
 		printf("Bem vindo\n");
@@ -59,7 +63,7 @@ int main(int argc, char * argv[]){
 
 					strcpy(buf,"i");
 					command=strtok(NULL,"\n");
-					printf("222=%s\n", command );
+					
 					strcpy(buf+1, command);
 
 					write(1,"pedrinha\n",9);
@@ -81,7 +85,7 @@ int main(int argc, char * argv[]){
 					strcpy(buf,"m");
 
 					command=strtok(NULL,"\n");
-					printf("222=%s\n", command );
+					
 
 					strcpy(buf+1, command);
 
@@ -106,7 +110,7 @@ int main(int argc, char * argv[]){
 					
 					command=strtok(NULL,"\n");
 					
-					printf("222=%s\n", command );
+					
 					strcpy(buf+1, command);
 
 
@@ -129,6 +133,15 @@ int main(int argc, char * argv[]){
 
 					write(fd,buf,strlen(buf)+1);
 
+
+					fd2 = open("FIFO2",O_RDONLY);
+					printf("estou a ouvir\n");
+						while((r = read(fd2,buffer,SIZE)) > 0) {
+
+							write(1,buffer,strlen(buffer)+1);
+						
+					}
+
 				}
 
 
@@ -144,10 +157,12 @@ int main(int argc, char * argv[]){
 
 					command=strtok(NULL,"\n");
 
-					printf("222=%s\n", command );
+					
 					strcpy(buf+1, command);
 
 					write(fd,buf,strlen(buf)+1);
+
+
 
 				}
 
@@ -164,6 +179,15 @@ int main(int argc, char * argv[]){
 					
 
 					write(fd,buf,strlen(buf)+1);
+
+					
+					fd2 = open("FIFO2",O_RDONLY);
+					printf("estou a ouvir\n");
+						while((r = read(fd2,buffer,SIZE)) > 0) {
+
+							write(1,buffer,strlen(buffer)+1);
+						
+					}
 				}				
 
 				else if(strcmp(command,"ajuda")==0){
@@ -178,6 +202,9 @@ int main(int argc, char * argv[]){
 					printf("terminar n (terminar tarefa n)\n");
 					printf("historico (registo historico de tarefas terminadas\n");
 					
+				}
+				else{
+					printf("comando desconhecido\n");
 				}
 
 				
@@ -273,6 +300,14 @@ int main(int argc, char * argv[]){
 			//while((r = read(0,buf,SIZE)) > 0) {
      	 		
      	 		write(fd,buf,strlen(buf)+1);
+
+     	 		fd2 = open("FIFO2",O_RDONLY);
+				printf("estou a ouvir\n");
+						while((r = read(fd2,buffer,SIZE)) > 0) {
+
+							write(1,buffer,strlen(buffer)+1);
+						
+					}
             
    			 //}
 
@@ -352,6 +387,14 @@ int main(int argc, char * argv[]){
 			//while((r = read(0,buf,SIZE)) > 0) {
      	 		
      	 		write(fd,buf,strlen(buf)+1);
+
+     	 		fd2 = open("FIFO2",O_RDONLY);
+				printf("estou a ouvir\n");
+						while((r = read(fd2,buffer,SIZE)) > 0) {
+
+							write(1,buffer,strlen(buffer)+1);
+						
+					}
             
    			 //}
 
@@ -383,12 +426,11 @@ int main(int argc, char * argv[]){
 
 		break;
 
+		
 
 	
-	}
 
-
-	
+		}
 	}
 	return 0;
 }

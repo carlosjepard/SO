@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#include "header.h"
+#include "argus.h"
 
 int * pids;
 int pids_count=0;
@@ -15,13 +15,18 @@ int ret=0;
 int zat=0;
 int servidor;
 
+
+
 void sigalarm2_handler(int signum){
-	
-	for(int i=0; i<pids_count; i++){	
+	//printf("pid=%d\n",getpid());
+	for(int i=0; i<pids_count; i++){
+
+
 		if(pids[i]>0){
 			//printf("killing grep %d\n", pids[i]);
 			kill(pids[i],SIGKILL);
 		}
+
 		kill(getpid(),SIGKILL);
 		_exit(3);
 	}
@@ -30,12 +35,13 @@ void sigalarm2_handler(int signum){
 
 void sigalarm_handler(int signum){	
 
+	write(1,"tempo de execucao atingido\n",27);
 	for(int i=0; i<pids_count; i++){
 		if(pids[i]>0){
 			//printf("killing grep %d\n", pids[i]);
 			kill(pids[i],SIGKILL);
 		}
-		write(1,"processo terminado\n",19);
+		//write(1,"processo terminado\n",19);
 	}
 	kill(servidor,SIGUSR1);
 	//printf("processo pai terminado %d\n",getpid());
@@ -68,6 +74,9 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 						perror("signal sigint");	
 						exit(4);
 			}
+
+			
+	//ALARME DE TEMPO DE EXECUCAO
 	alarm(tempoExec);
 	int quantos2=1;
 	for(int z =0; args[z]!='\0';z++){
@@ -85,6 +94,7 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 
 	int pid;
 	int j=-1;
+	//TAREFA SEM PIPES
 	if(quantos==1){
 
 		pids_count=1;
@@ -107,9 +117,9 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 	pids_count=quantos;
 	pids = (int*) malloc(sizeof(int)*quantos);
 	int pipe_fdd[quantos-1][2];
-	
+	//TAREFA COM PIPES
 	for(int i=0; i<quantos;i++ ){
-		
+		//PRIMEIRO COMANDO
 		if(i==0){
 
 			if(pipe(pipe_fdd[i])<0){
@@ -122,7 +132,6 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 			close(pipe_fdd[i][0]);
 			dup2(pipe_fdd[i][1],1);
 			close(pipe_fdd[i][1]);
-			sleep(10);
 			char * respostas[10];
 			parsecomand(pedidos[j], respostas);
 			execvp(respostas[0], respostas);
@@ -130,6 +139,7 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 		}
 		close(pipe_fdd[i][1]);
 	}
+	//ULTIMO COMANDO
 		else if(i==quantos-1){
 
 			close(pipe_fdd[i][1]);
@@ -148,6 +158,7 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 		}
 		close(pipe_fdd[i-1][0]);
 	}
+	//COMANDO
 		else if (i%2==0){
 			if(pipe(pipe_fdd[i])<0){
 				perror("pipe");
@@ -168,6 +179,7 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 		close(pipe_fdd[i-1][0]);
 		close(pipe_fdd[i][1]);
 		}
+		//VERIFICACAO DE FLUXO
 			else{
 				if(pipe(pipe_fdd[i])<0){
 					perror("pipe");
@@ -184,6 +196,7 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 					close(pipe_fdd[i][1]);	
 					int bytes_read;
 					char zz[100];
+					//ALARME DE INATIVIDADE
 					alarm(tempoInat);
 					while((bytes_read=read(0,zz,100))>0){
 						write(1,zz,bytes_read);
@@ -202,9 +215,7 @@ int executa (char * args,int tempoExec, int tempoInat, int servpid){
 		wait(&status);
 		if(WIFEXITED(status)==0) ret=2;
 	}
-	if(zat==1){
-		return 3;
-	} 
+	
 	return ret;
 }
 
